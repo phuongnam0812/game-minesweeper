@@ -1,1 +1,1 @@
-# game-minesweeper-
+# game-minesweeper
