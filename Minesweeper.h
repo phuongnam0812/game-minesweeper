@@ -7,7 +7,7 @@ public:
     void run();
 
 private:
-    int board[10][10];
+    Cell board[10][10];
     bool revealed[10][10];
     bool flagged[10][10];
 
@@ -18,9 +18,51 @@ private:
     void revealSquare(int row, int col);
     void flagSquare(int row, int col);
     void unflagSquare(int row, int col);
+    void displayBoard() const;
+    void processInput();
+    void uncoverCell(int row, int col);
+    void checkGameState();
     bool checkWin();
     bool checkLose(int row, int col);
+   
+    int numMines; // Số lượng mìn trên bảng chơi
+    int numRows; // Số lượng hàng trên bảng chơi
+    int numCols; // Số lượng cột trên bảng chơi
+    int numUncovered; // Số lượng ô trống đã được mở
+    bool gameOver; // Trạng thái của trò chơi (true nếu kết thúc, false nếu đang chơi)
+    int numCells; 
+    int mineUncovered;
 };
+ class Cell {
+    private:
+        bool isMine;
+        bool isCovered;
+        bool isFlagged;
+        int adjacentMines;
+
+    public:
+        Cell();
+        void uncover();
+        void toggleFlag();
+        bool isMine() const;
+        bool isCovered() const;
+        bool isFlagged() const;
+        int getAdjacentMines() const;
+        bool hasFlag(int flag) const;
+    };
+
+    class Board {
+    private:
+        Cell board[10][10];
+
+    public:
+        Board();
+        void print();
+        void uncover(int row, int col);
+        void toggleFlag(int row, int col);
+        bool isGameWon();
+    };
+
 
 #endif
 
