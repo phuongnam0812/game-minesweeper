@@ -1,26 +1,26 @@
-#OBJS specifies which files to compile as part of the project
-OBJS = main.cpp
-
-#CC specifies which compiler we're using
 CC = g++
+CFLAGS = -Wall -Werror -std=c++11
 
-#INCLUDE_PATHS specifies the additional include paths we'll need
-INCLUDE_PATHS = -IC:\phuongnam\Game\ASDL\SDL2-2.26.5\x86_64-w64-mingw32\include
+.PHONY: all clean
 
-#LIBRARY_PATHS specifies the additional library paths we'll need
-LIBRARY_PATHS = -LC:\phuongnam\Game\ASDL\SDL2-2.26.5\x86_64-w64-mingw32\lib
+all: minesweeper
 
-#COMPILER_FLAGS specifies the additional compilation options we're using
-# -w suppresses all warnings
-# -Wl,-subsystem,windows gets rid of the console window
-COMPILER_FLAGS = -w -Wl,-subsystem,windows
+run: ./minesweeper
 
-#LINKER_FLAGS specifies the libraries we're linking against
-LINKER_FLAGS = -lmingw32 -lSDL2main -lSDL2
+minesweeper: main.o MineSweeper.o Cell.o Board.o
+	$(CC) $(CFLAGS) $^ -o $@
 
-#OBJ_NAME specifies the name of our exectuable
-OBJ_NAME = main
+main.o: main.cpp MineSweeper.h
+	$(CC) $(CFLAGS) -c $< -o $@
 
-#This is the target that compiles our executable
-all : $(OBJS)
-	$(CC) $(OBJS) $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(COMPILER_FLAGS) $(LINKER_FLAGS) -o $(OBJ_NAME)
+MineSweeper.o: MineSweeper.cpp MineSweeper.h Cell.h Board.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+Cell.o: Cell.cpp Cell.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+Board.o: Board.cpp Board.h Cell.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+clean:
+	rm -f *.o minesweeper
