@@ -1,204 +1,809 @@
-#include "Minesweeper.h"
-#include <iostream>
-#include <stdlib.h>
-#include <time.h>
-using namespace std; 
+#include "Texture.h"
+#include "Variables.h"
+#include "constant.h"
+#include "Buttons.h"
+#include "MineSweeper.h"
+#include "Timer.h"
+#include <sstream>
+#include <fstream>
+using namespace std;
+vector<vector<LButton>> Buttons(3, vector<LButton>(2));
+LButton face;
+LButton goBack;
+LButton sound;
+LTimer timer;
 
-Minesweeper::Minesweeper() {
-    // Khởi tạo các biến cần thiết cho trò chơi
-    srand(time(NULL));
-    numMines = 10;
-    numRows = 9;
-    numCols = 9;
-    numUncovered = 0;
-    gameOver = false;
+// initialization func
+bool init()
+{
+	// Initialization flag
+	bool success = true;
 
-    // Khởi tạo các ô trống trên bảng chơi
-    for (int i = 0; i < numRows; i++) {
-        for (int j = 0; j < numCols; j++) {
-            board[i][j] = 0;
-            revealed[i][j] = false;
-            flagged[i][j] = false;
-        }
-    }
+	// Initialize SDL
+	if (SDL_Init(SDL_INIT_VIDEO) < 0)
+	{
+		printf("SDL could not initialize! SDL Error: %s\n", SDL_GetError());
+		success = false;
+	}
+	else
+	{
+		// Set texture filtering to linear
+		if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1"))
+		{
+			printf("Warning: Linear texture filtering not enabled!");
+		}
+
+		// Create window
+		window = SDL_CreateWindow(WINDOW_TITLE.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+		if (window == NULL)
+		{
+			printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
+			success = false;
+		}
+		else
+		{
+			// Create vsynced renderer for window
+			renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+			if (renderer == NULL)
+			{
+				printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError());
+				success = false;
+			}
+			else
+			{
+				// Initialize renderer color
+				SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+
+				// Initialize PNG loading
+				int imgFlags = IMG_INIT_PNG;
+				if (!(IMG_Init(imgFlags) & imgFlags))
+				{
+					printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
+					success = false;
+				}
+
+				// Initialize SDL_ttf
+				if (TTF_Init() == -1)
+				{
+					printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
+					success = false;
+				}
+				// Initialize SDL_mixer
+				if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+				{
+					printf("SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError());
+					success = false;
+				}
+			}
+		}
+	}
+
+	return success;
 }
 
-void Minesweeper::run() {
-    // Bắt đầu trò chơi và thực hiện vòng lặp chính của trò chơi
+bool loadmedia()
+{
+	bool success = true;
+	// Open image of tiles
+	if (!Tiles_image.loadFromFile("assests/images/tiles5.jpg"))
+	{
+		printf("Can't load this image from file!");
+		success = false;
+	}
+	else
+	{
+		// Set sprites
+		for (int i = 0; i < 12; ++i)
+		{
+			Tilesprites[i].x = i * TILE_SIZE;
+			Tilesprites[i].y = 0;
+			Tilesprites[i].w = TILE_SIZE;
+			Tilesprites[i].h = TILE_SIZE;
+		}
+	}
+	// load digits
+	if (!Digits.loadFromFile("assests/images/Untitled1.png"))
+	{
+		printf("Fail");
+		success = false;
+	}
+	else
+	{
+		// Set sprites
+		for (int i = 0; i < 10; i++)
+		{
+			Digitsprites[i].x = i * 28;
+			Digitsprites[i].y = 0;
+			Digitsprites[i].w = 28;
+			Digitsprites[i].h = 46;
+		}
+	}
+	// load easy table
+	if (!easyTable.loadFromFile("assests/images/easy.png"))
+	{
+		printf("Fail");
+		success = false;
+	}
+	// load medium table
+	if (!mediumTable.loadFromFile("assests/images/medium.png"))
+	{
+		printf("Fail");
+		success = false;
+	}
+	// load hard table
+	if (!hardTable.loadFromFile("assests/images/hard.png"))
+	{
+		printf("Fail");
+		success = false;
+	}
+	// load face
+	if (!winFace.loadFromFile("assests/images/winface.png"))
+	{
+		printf("Fail");
+		success = false;
+	}
+	if (!loseFace.loadFromFile("assests/images/loseface.png"))
+	{
+		printf("Fail");
+		success = false;
+	}
+	if (!playingFace.loadFromFile("assests/images/playingface.png"))
+	{
+		printf("Fail");
+		success = false;
+	}
+	if (!back.loadFromFile("assests/images/backicon.png"))
+	{
+		success = false;
+	}
+	if (!sound_on.loadFromFile("assests/images/unmute.png"))
+	{
+		success = false;
+	}
+	if (!sound_off.loadFromFile("assests/images/mute.png"))
+	{
+		success = false;
+	}
+	// Open the font
+	gFont = TTF_OpenFont("assests/font.ttf", 20);
+	if (gFont == NULL)
+	{
+		printf("Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError());
+		success = false;
+	}
+	// load text
+	SDL_Color textcolor1 = {255, 255, 255, 255};
+	if (!menu.loadFromRenderedText("START", textcolor1))
+	{
+		printf("Fail");
+	}
+	if (!menu1.loadFromRenderedText("EXIT", textcolor1))
+	{
+		printf("fail!");
+	}
+	SDL_Color color = {255, 0, 0, 255};
+	if (!menuColor.loadFromRenderedText("START", color))
+	{
+		printf("Fail");
+		success = false;
+	}
+	if (!menu1Color.loadFromRenderedText("EXIT", color))
+	{
+		printf("Fail");
+		success = false;
+	}
+	// Load music
+	loseMusic = Mix_LoadMUS("assests/audio/scratch.wav");
+	if (loseMusic == NULL)
+	{
+		printf("Failed to load beat music! SDL_mixer Error: %s\n", Mix_GetError());
+		success = false;
+	}
 
-    // In ra màn hình lời chào và hướng dẫn chơi trò chơi
-    cout << "Chao mung den voi tro choi Minesweeper!" << endl;
-    cout << "Ban hay nhap toa do cua mot o bat ki de bat dau choi. Vi du: A1" << endl;
-    cout << "Nhan Q de thoat khoi tro choi bat cu luc nao." << endl;
+	// Load sound effects
+	winMusic = Mix_LoadMUS("assests/audio/beat.wav");
+	if (winMusic == NULL)
+	{
+		printf("Failed to load scratch sound effect! SDL_mixer Error: %s\n", Mix_GetError());
+		success = false;
+	}
 
-    // Hiển thị bảng chơi lần đầu tiên
-    displayBoard();
-
-    // Vòng lặp chính của trò chơi
-    while (!gameOver) {
-        // Nhận input từ người chơi
-        string input;
-        cout << "Nhap toa do o can mo hoac dat co: ";
-        cin >> input;
-
-        // Kiểm tra input có phải là lệnh thoát không
-        if (input == "Q" || input == "q") {
-            cout << "Cam on ban da choi game!" << endl;
-            gameOver = true;
-            break;
-        }
-
-        // Xử lý input và thực hiện các hành động tương ứng
-        processInput(input);
-
-        // Hiển thị bảng chơi sau khi xử lý input
-        displayBoard();
-
-        // Kiểm tra trạng thái của trò chơi
-        checkGameState();
-    }
+	click = Mix_LoadWAV("assests/audio/click.wav");
+	if (click == NULL)
+	{
+		printf("Failed to load high sound effect! SDL_mixer Error: %s\n", Mix_GetError());
+		success = false;
+	}
+	return success;
 }
 
-void Minesweeper::init() {
-    // Khởi tạo các ô trống và đặt các mìn trong trò chơi
-    // ...
+bool loadMenuMedia()
+{
+	bool success = true;
+	// load background of menu
+	if (!menuTheme.loadFromFile("assests/images/menu.jpg"))
+	{
+		printf("Fail!");
+		success = false;
+	}
+	// load level choice
+	if (!levelTheme.loadFromFile("assests/images/mode.jpg"))
+	{
+		printf("Fail");
+		success = false;
+	}
+	// load choice text
+	SDL_Color textColor = {255, 255, 255, 255};
+	if (!easyChoice.loadFromRenderedText("EASY MODE", textColor))
+	{
+		printf("Fail");
+		success = false;
+	}
+	if (!mediumChoice.loadFromRenderedText("MEDIUM MODE", textColor))
+	{
+		printf("Fail");
+		success = false;
+	}
+	if (!hardChoice.loadFromRenderedText("HARD MODE", textColor))
+	{
+		printf("Fail");
+		success = false;
+	}
+	SDL_Color textcolor = {255, 0, 0, 255};
+	if (!easyChoiceColor.loadFromRenderedText("EASY MODE", textcolor))
+	{
+		printf("Fail");
+		success = false;
+	}
+	if (!mediumChoiceColor.loadFromRenderedText("MEDIUM MODE", textcolor))
+	{
+		printf("Fail");
+		success = false;
+	}
+	if (!hardChoiceColor.loadFromRenderedText("HARD MODE", textcolor))
+	{
+		printf("Fail");
+		success = false;
+	}
+	return success;
 }
 
-void Minesweeper::displayBoard() const {
-    // In ra các chữ cái đại diện cho các cột
-    cout << "  ";
-    for (int i = 0; i < numCols; i++) {
-        cout << static_cast<char>('A' + i) << " ";
-    }
-    cout << endl;
+// initialization games
+void CreateBoard()
+{
+	srand(time(0));
+	int mine = 0;
+	// Initialization
+	for (int i = 0; i < BOARD_SIZE_X; i++)
+	{
+		for (int j = 0; j < BOARD_SIZE_Y; j++)
+		{
+			sBoard[i][j] = 10;
+			board[i][j] = 0;
+		}
+	}
 
-    // In ra các hàng của bảng chơi
-    for (int i = 0; i < numRows; i++) {
-        // In ra số thứ tự của hàng
-        cout << i + 1 << " ";
-        // In ra các ô của hàng
-        for (int j = 0; j < numCols; j++) {
-            if (board[i][j].isCovered()) { // Ô chưa được mở
-                if (board[i][j].hasFlag()) { // Ô có cờ đánh
-                    cout << "F ";
-                } else { // Ô không có cờ đánh
-                    cout << ". ";
-                }
-            } else { // Ô đã được mở
-                if (board[i][j].hasMine()) { // Ô có mìn
-                    cout << "X ";
-                } else { // Ô không có mìn
-                    int numAdjacentMines = board[i][j].getAdjacentMineCount();
-                    cout << numAdjacentMines << " ";
-                }
-            }
-        }
-        cout << endl;
-    }
+	SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+	// Random mines in board
+	while (mine < NumberOfMines)
+	{
+		int i = rand() % BOARD_SIZE_X;
+		int j = rand() % BOARD_SIZE_Y;
+		if (board[i][j] == 9)
+			continue;
+		board[i][j] = 9;
+		mine++;
+	}
+
+	// Calculate the number of mines around each cell
+	for (int i = 0; i < BOARD_SIZE_X; i++)
+	{
+		for (int j = 0; j < BOARD_SIZE_Y; j++)
+		{
+			if (board[i][j] == 9)
+				continue;
+			for (int x = -1; x <= 1; x++)
+			{
+				for (int y = -1; y <= 1; y++)
+				{
+					int xpos = i + x;
+					int ypos = j + y;
+					if (xpos < 0 || xpos > BOARD_SIZE_X - 1 || ypos < 0 || ypos > BOARD_SIZE_Y - 1)
+						continue;
+					if (board[xpos][ypos] == 9)
+						board[i][j]++;
+				}
+			}
+		}
+	}
 }
 
-void Minesweeper::createMines() {
-    // Đặt các mìn vào bảng chơi
-    // ...
+void setButtonPosition()
+{
+	face.setPosition(BOARD_SIZE_X * TILE_SIZE / 2, digit_y);
+	goBack.setPosition(0, 0);
+	sound.setPosition(timeDigit_x - 10, 0);
+	for (int i = 0; i < BOARD_SIZE_X; ++i)
+	{
+		for (int j = 0; j < BOARD_SIZE_Y; ++j)
+		{
+			Buttons[i][j].setPosition(i * TILE_SIZE + distance_x, j * TILE_SIZE + distance_y);
+		}
+	}
 }
 
-void Minesweeper::fillNumbers() {
-    // Tính toán và đặt các số vào các ô xung quanh các mìn
-    // ...
+void createMenu()
+{
+	menuTheme.render(0, 0);
+	menu.render(600, 400);
+	menu1.render(750, 400);
+	SDL_RenderPresent(renderer);
 }
 
-void Minesweeper::revealBoard() {
-    // Hiển thị toàn bộ bảng chơi
-    // ...
+void createModeMenu()
+{
+	levelTheme.render(0, 0);
+	easyChoice.render(350, 150);
+	mediumChoice.render(350, 200);
+	hardChoice.render(350, 250);
+	SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 }
 
-void Minesweeper::revealSquare(int row, int col) {
-    // Hiển thị ô cụ thể trên bảng chơi
-    // ...
+void showMenu()
+{
+	bool startInside = false;
+	bool exitInside = false;
+	bool isMenuShowing = true;
+	SDL_Event event;
+	createMenu();
+	while (isMenuShowing)
+	{
+		while (SDL_PollEvent(&event) != 0)
+		{
+			if (event.type == SDL_QUIT)
+			{
+				mainLoop = false;
+				isMenuShowing = false;
+			}
+			if (event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEMOTION)
+			{
+				int x, y;
+				SDL_GetMouseState(&x, &y);
+				if (x > 600 && x < 600 + menu.getWidth() && y > 400 && y < 400 + menu.getHeight())
+					startInside = true;
+				else
+					startInside = false;
+				if (x > 750 && x < 750 + menu1.getWidth() && y > 400 && y < 400 + menu1.getHeight())
+					exitInside = true;
+				else
+					exitInside = false;
+				if (event.type == SDL_MOUSEBUTTONDOWN)
+				{
+					if (event.button.button == SDL_BUTTON_LEFT)
+					{
+						if (startInside == true)
+						{
+							start = true;
+							isMenuShowing = false;
+						}
+						if (exitInside == true)
+						{
+							mainLoop = false;
+							isMenuShowing = false;
+						}
+					}
+				}
+				if (event.type == SDL_MOUSEMOTION)
+				{
+					if (startInside == true)
+					{
+						menuColor.render(600, 400);
+					}
+					else
+						menu.render(600, 400);
+					if (exitInside == true)
+					{
+						menu1Color.render(750, 400);
+					}
+					else
+						menu1.render(750, 400);
+				}
+			}
+			SDL_RenderPresent(renderer);
+		}
+	}
 }
 
-void Minesweeper::flagSquare(int row, int col) {
-    // Đặt cờ trên một ô
-    // ...
+void showModeChoice()
+{
+	bool easyInside = false;
+	bool mediumInside = false;
+	bool hardInside = false;
+	SDL_Event event;
+	createModeMenu();
+	while (isChoosing)
+	{
+		while (SDL_PollEvent(&event) != 0)
+		{
+			if (event.type == SDL_QUIT)
+			{
+				mainLoop = false;
+				isChoosing = false;
+			}
+			if (event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEMOTION)
+			{
+				int x, y;
+				SDL_GetMouseState(&x, &y);
+				if (x > 350 && x < 350 + easyChoice.getWidth() && y > 150 && y < 150 + easyChoice.getHeight())
+					easyInside = true;
+				else
+					easyInside = false;
+				if (x > 350 && x < 350 + mediumChoice.getWidth() && y > 200 && y < 200 + mediumChoice.getHeight())
+					mediumInside = true;
+				else
+					mediumInside = false;
+				if (x > 350 && x < 350 + hardChoice.getWidth() && y > 250 && y < 250 + hardChoice.getHeight())
+					hardInside = true;
+				else
+					hardInside = false;
+				if (event.type == SDL_MOUSEBUTTONDOWN)
+				{
+					if (event.button.button == SDL_BUTTON_LEFT)
+					{
+						if (easyInside == true)
+						{
+							isRunning = true;
+							isChoosing = false;
+							timer.start();
+							easy = true;
+							medium = false;
+							hard = false;
+							SDL_SetWindowSize(window, 294, 436);
+							setGameMode(9, 9, 10, 21, 163, 25, 80, 235, BOARD_SIZE_X, BOARD_SIZE_Y, NumberOfMines, mineCountLeft, CountTileLeft, distance_x, distance_y, digit_x, digit_y, timeDigit_x);
+							CreateBoard();
+						}
+						if (mediumInside == true)
+						{
+							isRunning = true;
+							isChoosing = false;
+							timer.start();
+							easy = false;
+							medium = true;
+							hard = false;
+							SDL_SetWindowSize(window, 488, 630);
+							setGameMode(16, 16, 40, 21, 163, 25, 80, 430, BOARD_SIZE_X, BOARD_SIZE_Y, NumberOfMines, mineCountLeft, CountTileLeft, distance_x, distance_y, digit_x, digit_y, timeDigit_x);
+							CreateBoard();
+						}
+						if (hardInside == true)
+						{
+							isRunning = true;
+							isChoosing = false;
+							timer.start();
+							easy = false;
+							medium = false;
+							hard = true;
+							SDL_SetWindowSize(window, 880, 632);
+							setGameMode(30, 16, 99, 21, 163, 25, 80, 820, BOARD_SIZE_X, BOARD_SIZE_Y, NumberOfMines, mineCountLeft, CountTileLeft, distance_x, distance_y, digit_x, digit_y, timeDigit_x);
+							CreateBoard();
+						}
+					}
+				}
+				if (event.type == SDL_MOUSEMOTION)
+				{
+					if (easyInside == true)
+						easyChoiceColor.render(350, 150);
+					else
+						easyChoice.render(350, 150);
+					if (mediumInside == true)
+						mediumChoiceColor.render(350, 200);
+					else
+						mediumChoice.render(350, 200);
+					if (hardInside == true)
+						hardChoiceColor.render(350, 250);
+					else
+						hardChoice.render(350, 250);
+				}
+			}
+			SDL_RenderPresent(renderer);
+		}
+	}
 }
 
-void Minesweeper::unflagSquare(int row, int col) {
-    // Bỏ đánh dấu cờ trên một ô
-    // ...
+// ingame func
+void handleEvent()
+{
+	SDL_Event e;
+	while (SDL_PollEvent(&e) != 0)
+	{
+		if (e.type == SDL_QUIT)
+		{
+			isRunning = false;
+			mainLoop = false;
+		}
+		face.handleEventAgain(&e);
+		goBack.handleEventBack(&e);
+		sound.handleEventMute(&e);
+		for (int i = 0; i < BOARD_SIZE_X; i++)
+		{
+			for (int j = 0; j < BOARD_SIZE_Y; j++)
+			{
+				Buttons[i][j].handleEvent(&e);
+			}
+		}
+	}
 }
 
-bool Minesweeper::checkWin() {
-    // Kiểm tra xem người chơi đã thắng trò chơi hay chưa
-    // ...
+void reveal(int i, int j)
+{
+	if (sBoard[i][j] == 10 || sBoard[i][j] == 11)
+	{
+		if (sBoard[i][j] == 11)
+		{
+			return;
+		}
+		sBoard[i][j] = board[i][j];
+		if (sBoard[i][j] != 9)
+			CountTileLeft--;
+		if (sBoard[i][j] == 0)
+		{
+			for (int x = -1; x <= 1; x++)
+			{
+				for (int y = -1; y <= 1; y++)
+				{
+					int xpos = i + x;
+					int ypos = j + y;
+					if (xpos < 0 || xpos > BOARD_SIZE_X - 1 || ypos < 0 || ypos > BOARD_SIZE_Y - 1)
+						continue;
+					reveal(xpos, ypos);
+				}
+			}
+		}
+	}
 }
 
-bool Minesweeper::checkLose(int row, int col) {
-    // Kiểm tra xem người chơi đã thua trò chơi hay chưa
-    // ...
+void isPlayerWinning()
+{
+	if (CountTileLeft == NumberOfMines)
+		isWinning = true;
 }
 
-void Minesweeper::processInput() {
-    string input;
-    int row, col;
-    cout << "Enter the row and column (e.g. A5): ";
-    cin >> input;
-
-    // Chuyển đổi ký tự đầu tiên thành cột tương ứng
-    col = input[0] - 'A';
-
-    // Chuyển đổi ký tự thứ hai thành hàng tương ứng
-    row = stoi(input.substr(1)) - 1;
-
-    // Kiểm tra xem tọa độ nhập vào có hợp lệ hay không
-    if (row < 0 || row >= numRows || col < 0 || col >= numCols) {
-        cout << "Invalid input!" << endl;
-    } else {
-        uncoverCell(row, col);
-    }
+void GameManager()
+{
+	if (playAgain == true)
+		PlayAgain();
+	// if we lose
+	if (lose == true)
+	{
+		timer.pause();
+		loseFace.render(BOARD_SIZE_X * TILE_SIZE / 2, digit_y);
+		for (int i = 0; i < BOARD_SIZE_X; i++)
+		{
+			for (int j = 0; j < BOARD_SIZE_Y; j++)
+			{
+				Buttons[i][j].loseRender(i, j);
+			}
+		}
+	}
+	// if we win
+	if (isWinning == true)
+	{
+		timer.pause();
+		winFace.render(BOARD_SIZE_X * TILE_SIZE / 2, digit_y);
+		if (isRunning == false && isWinning)
+			getScore();
+	}
 }
 
-void Minesweeper::uncoverCell(int row, int col) {
-    if (row < 0 || row >= numRows || col < 0 || col >= numCols) {
-        // Tọa độ không hợp lệ
-        cout << "Invalid coordinate!" << endl;
-        return;
-    }
-
-    if (board[row][col].uncovered) {
-        // Ô đã được mở
-        cout << "This cell has already been uncovered!" << endl;
-        return;
-    }
-
-    if (board[row][col].isMine) {
-        // Ô là mìn
-        gameOver = true;
-        cout << "Game over! You hit a mine!" << endl;
-    } else {
-        // Mở ô và kiểm tra thắng/thua
-        board[row][col].uncovered = true;
-        numUncovered++;
-
-        if (numUncovered == numCells - numMines) {
-            gameOver = true;
-            cout << "Congratulations! You won!" << endl;
-        }
-    }
+std::string getTime()
+{
+	stringstream Time{};
+	if (isWinning == true)
+	{
+		int n = timer.getTicks() / 1000;
+		int h, m, s;
+		h = n / 3600;
+		m = (n - h * 3600) / 60;
+		s = (n - h * 3600 - m * 60);
+		Time.str("");
+		Time << h << ":" << m << ":" << s;
+		return Time.str();
+	}
+	else
+	{
+		int n = timer.getTicks() / 1000;
+		int h, m, s;
+		h = n / 3600;
+		m = (n - h * 3600) / 60;
+		s = (n - h * 3600 - m * 60);
+		Time.str("");
+		Time << h << ":" << m << ":" << s;
+		return Time.str();
+	}
 }
 
-void Minesweeper::checkGameState() {
-    if (gameOver) {
-        cout << "Game over!" << endl;
-    } else {
-        cout << "Game is still in progress." << endl;
-    }
+std::string getFileScoreName()
+{
+	stringstream os;
+	os.str("");
+	os << "score/" << BOARD_SIZE_X << "x" << BOARD_SIZE_Y << "x" << NumberOfMines << ".txt";
+	return os.str();
+}
 
-    if (numUncovered == numCells - numMines) {
-        cout << "Congratulations! You won!" << endl;
-    } else if (mineUncovered) {
-        gameOver = true;
-        cout << "Game over! You hit a mine!" << endl;
-    } else {
-        cout << "Keep playing to win." << endl;
-    }
+void getScore()
+{
+	ofstream outFile;
+	outFile.open(getFileScoreName().c_str(), ios::app);
+	outFile << getTime() << endl;
+	outFile.close();
+}
+
+void PlayAgain()
+{
+	// timer.stop();
+	if (isWinning)
+		getScore();
+	timer.start();
+	CreateBoard();
+	Mix_HaltMusic();
+	mineCountLeft = NumberOfMines;
+	CountTileLeft = BOARD_SIZE_X * BOARD_SIZE_Y;
+	isWinning = false;
+	lose = false;
+	playAgain = false;
+}
+
+void MineManager()
+{
+	int n = mineCountLeft;
+	if (mineCountLeft < 10)
+	{
+		Digits.render(digit_x, digit_y, &Digitsprites[0]);
+		for (int i = 0; i <= 9; i++)
+		{
+			if (i == mineCountLeft)
+				Digits.render(digit_x + 28, digit_y, &Digitsprites[i]);
+		}
+	}
+
+	else
+	{
+		int i = 0;
+		while (n > 0)
+		{
+			int x = n % 10;
+			n /= 10;
+			Digits.render(digit_x + (1 - i) * 28, digit_y, &Digitsprites[x]);
+			i++;
+		}
+	}
+}
+
+void TimeManager()
+{
+	int n = timer.getTicks() / 1000;
+	if (n < 10)
+	{
+		for (int i = 0; i <= 9; i++)
+		{
+			if (i == n)
+				Digits.render(timeDigit_x, digit_y, &Digitsprites[n]);
+		}
+	}
+	else
+	{
+		int i = 0;
+		while (n > 0)
+		{
+			int x = n % 10;
+			n /= 10;
+			Digits.render(timeDigit_x - i * 28, digit_y, &Digitsprites[x]);
+			i++;
+		}
+	}
+}
+
+void setGameMode(int x, int y, int n, int dx, int dy, int d1x, int d1y, int dtx, int &BOARD_SIZE_X, int &BOARD_SIZE_Y, int &NumberOfMines, int &mineCountLeft, int &CountTileLeft, int &distance_x, int &distance_y, int &digit_x, int &digit_y, int &timeDigit_x)
+{
+	BOARD_SIZE_X = x;
+	BOARD_SIZE_Y = y;
+	NumberOfMines = n;
+	mineCountLeft = n;
+	CountTileLeft = x * y;
+	distance_x = dx;
+	distance_y = dy;
+	digit_x = d1x;
+	digit_y = d1y;
+	timeDigit_x = dtx;
+
+	Buttons.resize(BOARD_SIZE_X);
+	for (int i = 0; i < BOARD_SIZE_X; i++)
+	{
+		Buttons[i].resize(BOARD_SIZE_Y);
+	}
+	sBoard.resize(BOARD_SIZE_X);
+	for (int i = 0; i < BOARD_SIZE_X; i++)
+	{
+		sBoard[i].resize(BOARD_SIZE_Y);
+	}
+	board.resize(BOARD_SIZE_X);
+	for (int i = 0; i < BOARD_SIZE_X; i++)
+	{
+		board[i].resize(BOARD_SIZE_Y);
+	}
+}
+
+void renderButton()
+{
+	for (int i = 0; i < BOARD_SIZE_X; i++)
+	{
+		for (int j = 0; j < BOARD_SIZE_Y; j++)
+		{
+			Buttons[i][j].render(i, j);
+		}
+	}
+}
+
+void renderGame()
+{
+	if (mute == false)
+	{
+		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+		SDL_RenderClear(renderer);
+		sound_on.render(timeDigit_x - 10, 0);
+		loseMusic = Mix_LoadMUS("assests/audio/scratch.wav");
+		winMusic = Mix_LoadMUS("assests/audio/beat.wav");
+		click = Mix_LoadWAV("assests/audio/click.wav");
+	}
+	else
+	{
+		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+		SDL_RenderClear(renderer);
+		sound_off.render(timeDigit_x - 10, 0);
+		click = NULL;
+		winMusic = NULL;
+		loseMusic = NULL;
+	}
+	if (easy == true || medium == true || hard == true )
+	{
+		if (easy == true)
+		{
+			easyTable.render(0, 50);
+		}
+		if (medium == true)
+		{
+			mediumTable.render(0, 50);
+		}
+		if (hard == true)
+		{
+			hardTable.render(0, 50);
+		}
+	}
+	playingFace.render(BOARD_SIZE_X * TILE_SIZE / 2, digit_y);
+	renderButton();
+	back.render(0, 0);
+	MineManager();
+	isPlayerWinning();
+	TimeManager();
+	GameManager();
+	SDL_RenderPresent(renderer);
+}
+
+// close SDL
+void close()
+{
+	// Free loaded images
+	Tiles_image.free();
+	// Free global font
+	TTF_CloseFont(gFont);
+	gFont = NULL;
+	// Destroy window
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(window);
+	window = NULL;
+	renderer = NULL;
+
+	// Quit SDL subsystems
+	TTF_Quit();
+	IMG_Quit();
+	SDL_Quit();
 }

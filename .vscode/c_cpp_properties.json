@@ -1,0 +1,25 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "C:/phuongnam/Game/ASDL/SDL2-2.26.5/x86_64-w64-mingw32/include/SDL2",
+                "C:/phuongnam/Game/ASDL/SDL2_image-2.6.3/x86_64-w64-mingw32/include/SDL2",
+                "C:\\phuongnam\\Game\\ASDL\\SDL2_ttf-2.20.2\\x86_64-w64-mingw32\\include\\SDL2",
+                "C:\\phuongnam\\Game\\ASDL\\SDL2_mixer-2.6.3\\x86_64-w64-mingw32\\include\\SDL2"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "compilerPath": "C:\\Users\\Admin\\scoop\\apps\\gcc\\11.2.0\\bin\\gcc.exe",
+            "cStandard": "c17",
+            "cppStandard": "gnu++17",
+            "intelliSenseMode": "windows-gcc-x64",
+            "configurationProvider": "ms-vscode.makefile-tools"
+        }
+    ],
+    "version": 4
+}
