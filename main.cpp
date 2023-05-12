@@ -1,7 +1,6 @@
 #include "Texture.h"
 #include "Buttons.h"
 #include "Variables.h"
-#include "constant.h"
 #include "MineSweeper.h"
 using namespace std;
 
@@ -28,7 +27,7 @@ int WinMain(int argc, char *argv[])
 					while (isRunning)
 					{
 						handleEvent();
-						setButtonPosition();
+						ArrangeButtons();
 						renderGame();
 					}
 				}

@@ -3,10 +3,10 @@
 #ifndef TIMER_H
 #define TIMER_H
 #include <SDL.h>
-class LTimer
+class Timer
 {
 public:
-	LTimer();
+	Timer();
 	void start();
 	void stop();
 	void pause();

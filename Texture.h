@@ -11,14 +11,14 @@
 #include <string>
 #include <vector>
 
-class LTexture
+class Texture
 {
 public:
 	// Initializes variables
-	LTexture(SDL_Texture *_mTexture, int _mWidth, int _mHeight);
+	Texture(SDL_Texture *_mTexture, int _mWidth, int _mHeight);
 
 	// Deallocates memory
-	~LTexture();
+	~Texture();
 
 	// Loads image at specified path
 	bool loadFromFile(std::string path);

@@ -23,7 +23,7 @@ OBJS = $(SRCS:.cpp=.o)
 minesweeper: $(OBJS)
 	$(CXX) $(CXXFLAGS) $(OBJS) $(SDL2_COMPILER_FLAGS) $(COMPILER_FLAGS) -o minesweeper
 
-main.o: main.cpp Texture.h Buttons.h Variables.h constant.h MineSweeper.h Timer.h
+main.o: main.cpp Texture.h Buttons.h Variables.h MineSweeper.h Timer.h
 	$(CXX) $(CXXFLAGS) $(SDL2_COMPILER_FLAGS) -c main.cpp
 
 Texture.o: Texture.cpp Texture.h
@@ -32,16 +32,14 @@ Texture.o: Texture.cpp Texture.h
 Buttons.o: Buttons.cpp Buttons.h
 	$(CXX) $(CXXFLAGS) $(SDL2_COMPILER_FLAGS) -c Buttons.cpp
 
-# constant.o: constant.cpp constant.h
-# 	$(CXX) $(CXXFLAGS) $(OBJS) $(SDL2_COMPILER_FLAGS) $(COMPILER_FLAGS) -c constant.cpp
 
-MineSweeper.o: MineSweeper.cpp MineSweeper.h Variables.h constant.h Buttons.h Texture.h Timer.h
+MineSweeper.o: MineSweeper.cpp MineSweeper.h Variables.h Buttons.h Texture.h Timer.h
 	$(CXX) $(CXXFLAGS) $(SDL2_COMPILER_FLAGS) -c MineSweeper.cpp
 
 Timer.o: Timer.cpp Timer.h
 	$(CXX) $(CXXFLAGS) $(SDL2_COMPILER_FLAGS) -c Timer.cpp
 
-Variables.o: Variables.cpp Variables.h Texture.h Buttons.h constant.h
+Variables.o: Variables.cpp Variables.h Texture.h Buttons.h 
 	$(CXX) $(CXXFLAGS) $(SDL2_COMPILER_FLAGS) -c Variables.cpp
 
 clean:

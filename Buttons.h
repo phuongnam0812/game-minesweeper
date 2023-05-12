@@ -5,11 +5,11 @@
 
 #include <SDL.h>
 
-class LButton
+class Button
 {
 public:
 	// Initializes internal variables
-	LButton();
+	Button();
 
 	// Sets top left position
 	void setPosition(int x, int y);

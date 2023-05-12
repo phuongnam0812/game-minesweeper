@@ -4,12 +4,11 @@
 #define VARIABLES_H
 
 #include "Texture.h"
-#include "constant.h"
 #include "Buttons.h"
 
 // initialization
-extern SDL_Window* window;
-extern SDL_Renderer* renderer;
+extern SDL_Window *window;
+extern SDL_Renderer *renderer;
 
 // loop variable
 extern bool isRunning;
@@ -17,50 +16,48 @@ extern bool showmenu;
 extern bool isChoosing;
 extern bool mainLoop;
 
-//win or lose
+// win or lose
 extern bool isWinning;
 extern bool lose;
 
-
-
 // image use in game
-extern LTexture menuTheme;
-extern LTexture levelTheme;
-extern LTexture easyTable;
-extern LTexture mediumTable;
-extern LTexture hardTable;
-extern LTexture back;
-extern LTexture sound_on;
-extern LTexture sound_off;
+extern Texture menuTheme;
+extern Texture levelTheme;
+extern Texture easyTable;
+extern Texture mediumTable;
+extern Texture hardTable;
+extern Texture back;
+extern Texture music_on;
+extern Texture music_off;
 
 // image face
-extern LTexture winFace;
-extern LTexture playingFace;
-extern LTexture loseFace;
+extern Texture winFace;
+extern Texture playingFace;
+extern Texture loseFace;
 
 // Tiles in board
-extern LTexture Tiles_image;
+extern Texture Tiles_image;
 extern SDL_Rect Tilesprites[12];
 
 // text
-extern LTexture menu;
-extern LTexture menu1;
-extern LTexture menuColor;
-extern LTexture menu1Color;
-extern LTexture easyChoice;
-extern LTexture mediumChoice;
-extern LTexture hardChoice;
-extern LTexture easyChoiceColor;
-extern LTexture mediumChoiceColor;
-extern LTexture hardChoiceColor;
-extern LTexture wInput;
-extern LTexture hInput;
-extern LTexture mInput;
-extern TTF_Font* gFont;
+extern Texture startBtn;
+extern Texture exitBtn;
+extern Texture menuColor;
+extern Texture menu1Color;
+extern Texture easyChoice;
+extern Texture mediumChoice;
+extern Texture hardChoice;
+extern Texture easyChoiceColor;
+extern Texture mediumChoiceColor;
+extern Texture hardChoiceColor;
+extern Texture wInput;
+extern Texture hInput;
+extern Texture mInput;
+extern TTF_Font *gFont;
 
-// Create board data 
-extern std::vector <std::vector<int> > sBoard;
-extern std::vector <std::vector<int> > board;
+// Create board data
+extern std::vector<std::vector<int>> sBoard;
+extern std::vector<std::vector<int>> board;
 
 // mines
 extern int mineCountLeft;
@@ -68,9 +65,9 @@ extern int CountTileLeft;
 
 // audio
 extern bool mute;
-extern Mix_Chunk* click;
-extern Mix_Music* loseMusic;
-extern Mix_Music* winMusic;
+extern Mix_Chunk *click;
+extern Mix_Music *loseMusic;
+extern Mix_Music *winMusic;
 
 // distance
 extern int distance_x;
@@ -80,12 +77,12 @@ extern int digit_y;
 extern int timeDigit_x;
 
 // digits image
-extern LTexture Digits;
+extern Texture Digits;
 extern SDL_Rect Digitsprites[10];
 
 // board size
-extern int BOARD_SIZE_X;
-extern int BOARD_SIZE_Y;
+extern int board_size_x;
+extern int board_size_y;
 extern int NumberOfMines;
 
 // boolean
@@ -96,4 +93,4 @@ extern bool easy;
 extern bool medium;
 extern bool hard;
 
-#endif 
+#endif

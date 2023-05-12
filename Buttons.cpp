@@ -1,21 +1,24 @@
 #include "Variables.h"
-#include "constant.h"
 #include "Buttons.h"
 #include "MineSweeper.h"
 
-LButton::LButton()
+const int SCREEN_WIDTH = 889;
+const int SCREEN_HEIGHT = 500;
+const int TILE_SIZE = 28;
+
+Button::Button()
 {
 	mPosition.x = 0;
 	mPosition.y = 0;
 }
 
-void LButton::setPosition(int x, int y)
+void Button::setPosition(int x, int y)
 {
 	mPosition.x = x;
 	mPosition.y = y;
 }
 
-void LButton::handleEventAgain(SDL_Event *e)
+void Button::handleEventAgain(SDL_Event *e)
 {
 	if (e->type == SDL_MOUSEBUTTONDOWN)
 	{
@@ -52,7 +55,7 @@ void LButton::handleEventAgain(SDL_Event *e)
 	}
 }
 
-void LButton::handleEventBack(SDL_Event *e)
+void Button::handleEventBack(SDL_Event *e)
 {
 	if (e->type == SDL_MOUSEBUTTONDOWN)
 	{
@@ -96,7 +99,7 @@ void LButton::handleEventBack(SDL_Event *e)
 	}
 }
 
-void LButton::handleEventMute(SDL_Event *e)
+void Button::handleEventMute(SDL_Event *e)
 {
 	if (e->type == SDL_MOUSEBUTTONDOWN)
 	{
@@ -136,54 +139,54 @@ void LButton::handleEventMute(SDL_Event *e)
 	}
 }
 
-void LButton::handleEvent(SDL_Event *e)
+void Button::handleEvent(SDL_Event *e)
 {
-	// If mouse event happened
+	// neu xu kien xay ra 
 	if (e->type == SDL_MOUSEMOTION || e->type == SDL_MOUSEBUTTONDOWN || e->type == SDL_MOUSEBUTTONUP)
 	{
-		// Get mouse position
+		// lay vi tri cua chuot 
 		int x, y;
 		SDL_GetMouseState(&x, &y);
 
 		int i = (x - distance_x) / TILE_SIZE;
 		int j = (y - distance_y) / TILE_SIZE;
 
-		// Check if mouse is in button
+		// kiem tra chuot co dang o vi tri cua btn khong 
 		bool inside = true;
 
-		// Mouse is left of the button
+		// chuot ben trai 
 		if (x < mPosition.x)
 		{
 			inside = false;
 		}
-		// Mouse is right of the button
+		// chuot ben phai 
 		else if (x > mPosition.x + TILE_SIZE)
 		{
 			inside = false;
 		}
-		// Mouse above the button
+		// chuot ben tren 
 		else if (y < mPosition.y)
 		{
 			inside = false;
 		}
-		// Mouse below the button
+		// chuot ben duoi 
 		else if (y > mPosition.y + TILE_SIZE)
 		{
 			inside = false;
 		}
 
-		// Mouse is inside button
+		// chuot o trong btn 
 		if (inside)
 		{
 			if (e->type == SDL_MOUSEBUTTONDOWN)
 			{
 
-				// Set mouse clicked
+				// khi nhap chuot 
 				switch (e->button.button)
 				{
 				case SDL_BUTTON_LEFT:
 				{
-					reveal(i, j);
+					revealCells(i, j);
 					if (CountTileLeft == NumberOfMines)
 					{
 						Mix_PlayMusic(winMusic, 1);
@@ -225,12 +228,12 @@ void LButton::handleEvent(SDL_Event *e)
 	}
 }
 
-void LButton::render(int i, int j)
+void Button::render(int i, int j)
 {
 	// Show current button sprite
 	Tiles_image.render(mPosition.x, mPosition.y, &Tilesprites[sBoard[i][j]]);
 }
-void LButton::loseRender(int i, int j)
+void Button::loseRender(int i, int j)
 {
 	// Show all button sprite
 	Tiles_image.render(mPosition.x, mPosition.y, &Tilesprites[board[i][j]]);
