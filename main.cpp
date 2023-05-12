@@ -22,7 +22,7 @@ int WinMain(int argc, char *argv[])
 				{
 					if (isChoosing)
 					{
-						showModeChoice();
+						showModeSelected();
 					}
 					while (isRunning)
 					{

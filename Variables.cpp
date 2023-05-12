@@ -21,19 +21,19 @@ extern Texture easyTable(NULL, 0, 0);
 extern Texture mediumTable(NULL, 0, 0);
 extern Texture hardTable(NULL, 0, 0);
 extern Texture back(NULL, 0, 0);
-extern Texture music_on(NULL, 0, 0);
-extern Texture music_off(NULL, 0, 0);
+extern Texture audio_on(NULL, 0, 0);
+extern Texture audio_of(NULL, 0, 0);
 
 // image face
-extern Texture winFace(NULL, 0, 0);
-extern Texture playingFace(NULL, 0, 0);
-extern Texture loseFace(NULL, 0, 0);
+extern Texture winIcon(NULL, 0, 0);
+extern Texture playingIcon(NULL, 0, 0);
+extern Texture loseIcon(NULL, 0, 0);
 
 // text
-extern Texture startBtn(NULL, 0, 0);
+extern Texture playBtn(NULL, 0, 0);
 extern Texture exitBtn(NULL, 0, 0);
-extern Texture menuColor(NULL, 0, 0);
-extern Texture menu1Color(NULL, 0, 0);
+extern Texture playBtnColor(NULL, 0, 0);
+extern Texture exitBtnColor(NULL, 0, 0);
 extern Texture easyChoice(NULL, 0, 0);
 extern Texture mediumChoice(NULL, 0, 0);
 extern Texture hardChoice(NULL, 0, 0);
@@ -45,8 +45,8 @@ extern Texture hInput(NULL, 0, 0);
 extern Texture mInput(NULL, 0, 0);
 
 // create board data
-extern std::vector<std::vector<int>> sBoard(3, std::vector<int>(2, 0));
-extern std::vector<std::vector<int>> board(3, std::vector<int>(2, 0));
+extern std::vector<std::vector<int>> stateCell(3, std::vector<int>(2, 0));
+extern std::vector<std::vector<int>> cell(3, std::vector<int>(2, 0));
 
 // Tiles in board
 extern Texture Tiles_image(NULL, 0, 0);

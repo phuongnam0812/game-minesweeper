@@ -27,23 +27,23 @@ extern Texture easyTable;
 extern Texture mediumTable;
 extern Texture hardTable;
 extern Texture back;
-extern Texture music_on;
-extern Texture music_off;
+extern Texture audio_on;
+extern Texture audio_of;
 
 // image face
-extern Texture winFace;
-extern Texture playingFace;
-extern Texture loseFace;
+extern Texture winIcon;
+extern Texture playingIcon;
+extern Texture loseIcon;
 
 // Tiles in board
 extern Texture Tiles_image;
 extern SDL_Rect Tilesprites[12];
 
 // text
-extern Texture startBtn;
+extern Texture playBtn;
 extern Texture exitBtn;
-extern Texture menuColor;
-extern Texture menu1Color;
+extern Texture playBtnColor;
+extern Texture exitBtnColor;
 extern Texture easyChoice;
 extern Texture mediumChoice;
 extern Texture hardChoice;
@@ -56,8 +56,8 @@ extern Texture mInput;
 extern TTF_Font *gFont;
 
 // Create board data
-extern std::vector<std::vector<int>> sBoard;
-extern std::vector<std::vector<int>> board;
+extern std::vector<std::vector<int>> stateCell;
+extern std::vector<std::vector<int>> cell;
 
 // mines
 extern int mineCountLeft;

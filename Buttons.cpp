@@ -191,7 +191,7 @@ void Button::handleEvent(SDL_Event *e)
 					{
 						Mix_PlayMusic(winMusic, 1);
 					}
-					if (sBoard[i][j] == 9)
+					if (stateCell[i][j] == 9)
 					{
 						lose = true;
 						Mix_PlayMusic(loseMusic, 1);
@@ -205,16 +205,16 @@ void Button::handleEvent(SDL_Event *e)
 				case SDL_BUTTON_RIGHT:
 				{
 					Mix_PlayChannel(-1, click, 0);
-					if (sBoard[i][j] >= 10)
+					if (stateCell[i][j] >= 10)
 					{
-						if (sBoard[i][j] == 11)
+						if (stateCell[i][j] == 11)
 						{
-							sBoard[i][j] = 10;
+							stateCell[i][j] = 10;
 							mineCountLeft++;
 						}
 						else
 						{
-							sBoard[i][j] = 11;
+							stateCell[i][j] = 11;
 							mineCountLeft--;
 						}
 					}
@@ -231,10 +231,10 @@ void Button::handleEvent(SDL_Event *e)
 void Button::render(int i, int j)
 {
 	// Show current button sprite
-	Tiles_image.render(mPosition.x, mPosition.y, &Tilesprites[sBoard[i][j]]);
+	Tiles_image.render(mPosition.x, mPosition.y, &Tilesprites[stateCell[i][j]]);
 }
 void Button::loseRender(int i, int j)
 {
 	// Show all button sprite
-	Tiles_image.render(mPosition.x, mPosition.y, &Tilesprites[board[i][j]]);
+	Tiles_image.render(mPosition.x, mPosition.y, &Tilesprites[cell[i][j]]);
 }

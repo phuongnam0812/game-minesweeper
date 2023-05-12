@@ -18,12 +18,12 @@ void GameCreateBoard();
 void createMenu();
 void createModeMenu();
 void showMenu();
-void showModeChoice();
+void showModeSelected();
 void ArrangeButtons();
 
 // ingame func
 void IsWin();
-void MineManager();
+void renderMineCount();
 void PlayAgain();
 void HandleGameEvents();
 std::string getTime();
