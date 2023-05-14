@@ -562,8 +562,6 @@ void HandleGameEvents()
 	{
 		timer.pause();
 		winIcon.render(board_size_x * TILE_SIZE / 2, digit_y);
-		// if (isRunning == false && isWinning)
-		// getScore();
 	}
 }
 
@@ -602,10 +600,7 @@ std::string getTime()
 
 void PlayAgain()
 {
-	// timer.stop();
-	if (isWinning)
-		// getScore();
-		timer.start();
+	timer.start();
 	GameCreateBoard();
 	Mix_HaltMusic();
 	mineCountLeft = NumberOfMines;
