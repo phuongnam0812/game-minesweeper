@@ -85,7 +85,7 @@ bool init()
 	return loadingState;
 }
 
-bool loadmedia()
+bool loadMedia()
 {
 	bool loadingState = true;
 	// mo tiles
@@ -157,12 +157,12 @@ bool loadmedia()
 	{
 		loadingState = false;
 	}
-	if (!audio_of.loadFromFile("assests/images/mute.png"))
+	if (!audio_off.loadFromFile("assests/images/mute.png"))
 	{
 		loadingState = false;
 	}
 	//  mo font chu
-	gFont = TTF_OpenFont("assests/font.ttf", 40);
+	gFont = TTF_OpenFont("assests/font.ttf", 37);
 	if (gFont == NULL)
 	{
 		printf("Failed to load font! SDL_ttf Error: %s\n", TTF_GetError());
@@ -210,12 +210,7 @@ bool loadmedia()
 		printf("Failed to load high sound effect! SDL_mixer Error: %s\n", Mix_GetError());
 		loadingState = false;
 	}
-	return loadingState;
-}
-
-bool loadMenuMedia()
-{
-	bool loadingState = true;
+	// bool loadingState = true;
 	// load background of menu
 	if (!menuTheme.loadFromFile("assests/images/menu.jpg"))
 	{
@@ -223,7 +218,7 @@ bool loadMenuMedia()
 		loadingState = false;
 	}
 	// load level choice
-	if (!levelTheme.loadFromFile("assests/images/mode.jpg"))
+	if (!levelTheme.loadFromFile("assests/images/level.jpg"))
 	{
 		printf("Fail");
 		loadingState = false;
@@ -278,8 +273,8 @@ void GameCreateBoard()
 			cell[i][j] = 0;
 		}
 	}
-
 	SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+
 	// dat bom ngau nhien
 	while (mine < NumberOfMines)
 	{
@@ -290,7 +285,6 @@ void GameCreateBoard()
 		cell[i][j] = 9;
 		mine++;
 	}
-
 	// tinh so luong bom xung quanh moi o
 	for (int i = 0; i < board_size_x; i++)
 	{
@@ -336,7 +330,7 @@ void createMenu()
 	SDL_RenderPresent(renderer);
 }
 
-void createModeMenu()
+void createLevelMenu()
 {
 	levelTheme.render(0, 0);
 	easyChoice.render(370, 200);
@@ -345,7 +339,7 @@ void createModeMenu()
 	SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 }
 
-void showMenu()
+void renderMenu()
 {
 	bool startInside = false;
 	bool exitInside = false;
@@ -395,11 +389,11 @@ void showMenu()
 	}
 }
 
-void showModeSelected()
+void renderLevelSelected()
 {
 	int gameMode = 0; // lưu trạng thái lựa chọn cấp độ chơi
 	SDL_Event event;
-	createModeMenu();
+	createLevelMenu();
 	while (isChoosing)
 	{
 		while (SDL_PollEvent(&event) != 0)
@@ -435,7 +429,7 @@ void showModeSelected()
 							medium = false;
 							hard = false;
 							SDL_SetWindowSize(window, 294, 436);
-							setGameMode(9, 9, 10, 21, 163, 25, 80, 235, board_size_x, board_size_y, NumberOfMines, mineCountLeft, CountTileLeft, distance_x, distance_y, digit_x, digit_y, timeDigit_x);
+							setGameLevel(9, 9, 10, 21, 163, 25, 80, 235, board_size_x, board_size_y, NumberOfMines, mineCountLeft, CountTileLeft, distance_x, distance_y, digit_x, digit_y, timeDigit_x);
 							GameCreateBoard();
 						}
 						else if (gameMode == 2)
@@ -447,7 +441,7 @@ void showModeSelected()
 							medium = true;
 							hard = false;
 							SDL_SetWindowSize(window, 488, 630);
-							setGameMode(16, 16, 40, 21, 163, 25, 80, 430, board_size_x, board_size_y, NumberOfMines, mineCountLeft, CountTileLeft, distance_x, distance_y, digit_x, digit_y, timeDigit_x);
+							setGameLevel(16, 16, 40, 21, 163, 25, 80, 430, board_size_x, board_size_y, NumberOfMines, mineCountLeft, CountTileLeft, distance_x, distance_y, digit_x, digit_y, timeDigit_x);
 							GameCreateBoard();
 						}
 						else if (gameMode == 3)
@@ -459,7 +453,7 @@ void showModeSelected()
 							medium = false;
 							hard = true;
 							SDL_SetWindowSize(window, 880, 632);
-							setGameMode(30, 16, 90, 21, 163, 25, 80, 820, board_size_x, board_size_y, NumberOfMines, mineCountLeft, CountTileLeft, distance_x, distance_y, digit_x, digit_y, timeDigit_x);
+							setGameLevel(30, 16, 90, 21, 163, 25, 80, 820, board_size_x, board_size_y, NumberOfMines, mineCountLeft, CountTileLeft, distance_x, distance_y, digit_x, digit_y, timeDigit_x);
 							GameCreateBoard();
 						}
 					}
@@ -467,6 +461,59 @@ void showModeSelected()
 			}
 		}
 		SDL_RenderPresent(renderer); // vẽ màn hình sau khi đã xử lý sự kiện
+	}
+}
+// mở ô
+void revealCells(int i, int j)
+{
+	if (stateCell[i][j] == 10 || stateCell[i][j] == 11)
+	{
+		if (stateCell[i][j] == 11)
+		{
+			return;
+		}
+		stateCell[i][j] = cell[i][j];
+		if (stateCell[i][j] != 9)
+			CountTileLeft--;
+		if (stateCell[i][j] == 0)
+		{
+			for (int x = -1; x <= 1; x++)
+			{
+				for (int y = -1; y <= 1; y++)
+				{
+					int xard = i + x;
+					int yard = j + y;
+					if (xard < 0 || xard > board_size_x - 1 || yard < 0 || yard > board_size_y - 1)
+						continue;
+					revealCells(xard, yard);
+				}
+			}
+		}
+	}
+}
+void renderMineCount()
+{
+	int n = mineCountLeft;
+	if (mineCountLeft < 10)
+	{
+		Digits.render(digit_x, digit_y, &Digitsprites[0]);
+		for (int i = 0; i <= 9; i++)
+		{
+			if (i == mineCountLeft)
+				Digits.render(digit_x + 28, digit_y, &Digitsprites[i]);
+		}
+	}
+
+	else
+	{
+		int i = 0;
+		while (n > 0)
+		{
+			int x = n % 10;
+			n /= 10;
+			Digits.render(digit_x + (1 - i) * 28, digit_y, &Digitsprites[x]);
+			i++;
+		}
 	}
 }
 // ham trong game
@@ -515,36 +562,8 @@ void HandleGameEvents()
 	{
 		timer.pause();
 		winIcon.render(board_size_x * TILE_SIZE / 2, digit_y);
-		if (isRunning == false && isWinning)
-			getScore();
-	}
-}
-
-void revealCells(int i, int j)
-{
-	if (stateCell[i][j] == 10 || stateCell[i][j] == 11)
-	{
-		if (stateCell[i][j] == 11)
-		{
-			return;
-		}
-		stateCell[i][j] = cell[i][j];
-		if (stateCell[i][j] != 9)
-			CountTileLeft--;
-		if (stateCell[i][j] == 0)
-		{
-			for (int x = -1; x <= 1; x++)
-			{
-				for (int y = -1; y <= 1; y++)
-				{
-					int xard = i + x;
-					int yard = j + y;
-					if (xard < 0 || xard > board_size_x - 1 || yard < 0 || yard > board_size_y - 1)
-						continue;
-					revealCells(xard, yard);
-				}
-			}
-		}
+		// if (isRunning == false && isWinning)
+		// getScore();
 	}
 }
 
@@ -581,54 +600,12 @@ std::string getTime()
 	}
 }
 
-std::string getFileScoreName()
-{
-	stringstream os;
-	os.str("");
-	os << "score/" << board_size_x << "x" << board_size_y << "x" << NumberOfMines << ".txt";
-	return os.str();
-}
-
-void getScore()
-{
-	ofstream outFile;
-	outFile.open(getFileScoreName().c_str(), ios::app);
-	outFile << getTime() << endl;
-	outFile.close();
-}
-
-void renderMineCount()
-{
-	int n = mineCountLeft;
-	if (mineCountLeft < 10)
-	{
-		Digits.render(digit_x, digit_y, &Digitsprites[0]);
-		for (int i = 0; i <= 9; i++)
-		{
-			if (i == mineCountLeft)
-				Digits.render(digit_x + 28, digit_y, &Digitsprites[i]);
-		}
-	}
-
-	else
-	{
-		int i = 0;
-		while (n > 0)
-		{
-			int x = n % 10;
-			n /= 10;
-			Digits.render(digit_x + (1 - i) * 28, digit_y, &Digitsprites[x]);
-			i++;
-		}
-	}
-}
-
 void PlayAgain()
 {
 	// timer.stop();
 	if (isWinning)
-		getScore();
-	timer.start();
+		// getScore();
+		timer.start();
 	GameCreateBoard();
 	Mix_HaltMusic();
 	mineCountLeft = NumberOfMines;
@@ -637,7 +614,7 @@ void PlayAgain()
 	lose = false;
 	playAgain = false;
 }
-void setGameMode(int x, int y, int n, int dx, int dy, int d1x, int d1y, int dtx, int &board_size_x, int &board_size_y, int &NumberOfMines, int &mineCountLeft, int &CountTileLeft, int &distance_x, int &distance_y, int &digit_x, int &digit_y, int &timeDigit_x)
+void setGameLevel(int x, int y, int n, int dx, int dy, int d1x, int d1y, int dtx, int &board_size_x, int &board_size_y, int &NumberOfMines, int &mineCountLeft, int &CountTileLeft, int &distance_x, int &distance_y, int &digit_x, int &digit_y, int &timeDigit_x)
 {
 	board_size_x = x;
 	board_size_y = y;
@@ -717,7 +694,7 @@ void renderGame()
 	{
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 		SDL_RenderClear(renderer);
-		audio_of.render(timeDigit_x + 8, 0);
+		audio_off.render(timeDigit_x + 8, 0);
 		click = NULL;
 		winMusic = NULL;
 		loseMusic = NULL;

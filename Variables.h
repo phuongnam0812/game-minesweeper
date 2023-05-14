@@ -28,7 +28,7 @@ extern Texture mediumTable;
 extern Texture hardTable;
 extern Texture back;
 extern Texture audio_on;
-extern Texture audio_of;
+extern Texture audio_off;
 
 // image face
 extern Texture winIcon;
@@ -87,7 +87,7 @@ extern int NumberOfMines;
 
 // boolean
 extern bool playAgain;
-extern bool saveScore;
+// extern bool saveScore;
 extern bool start;
 extern bool easy;
 extern bool medium;

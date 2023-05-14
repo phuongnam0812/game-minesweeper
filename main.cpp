@@ -13,16 +13,15 @@ int WinMain(int argc, char *argv[])
 	}
 	else
 	{
-		if (loadmedia())
+		if (loadMedia())
 		{
-			if (loadMenuMedia())
-			{
-				showMenu();
+			
+				renderMenu();
 				while (mainLoop)
 				{
 					if (isChoosing)
 					{
-						showModeSelected();
+						renderLevelSelected();
 					}
 					while (isRunning)
 					{
@@ -31,7 +30,6 @@ int WinMain(int argc, char *argv[])
 						renderGame();
 					}
 				}
-			}
 		}
 	}
 	// Free resources and close SDL

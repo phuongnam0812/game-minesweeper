@@ -22,7 +22,7 @@ extern Texture mediumTable(NULL, 0, 0);
 extern Texture hardTable(NULL, 0, 0);
 extern Texture back(NULL, 0, 0);
 extern Texture audio_on(NULL, 0, 0);
-extern Texture audio_of(NULL, 0, 0);
+extern Texture audio_off(NULL, 0, 0);
 
 // image face
 extern Texture winIcon(NULL, 0, 0);
@@ -76,7 +76,7 @@ extern int NumberOfMines = 0;
 
 // boolean
 extern bool playAgain = false;
-extern bool saveScore = false;
+// extern bool saveScore = false;
 extern bool start = false;
 extern bool easy = false;
 extern bool medium = false;
