@@ -466,30 +466,31 @@ void renderLevelSelected()
 // mở ô
 void revealCells(int i, int j)
 {
-	if (stateCell[i][j] == 10 || stateCell[i][j] == 11)
-	{
-		if (stateCell[i][j] == 11)
-		{
-			return;
-		}
-		stateCell[i][j] = cell[i][j];
-		if (stateCell[i][j] != 9)
-			CountTileLeft--;
-		if (stateCell[i][j] == 0)
-		{
-			for (int x = -1; x <= 1; x++)
-			{
-				for (int y = -1; y <= 1; y++)
-				{
-					int xard = i + x;
-					int yard = j + y;
-					if (xard < 0 || xard > board_size_x - 1 || yard < 0 || yard > board_size_y - 1)
-						continue;
-					revealCells(xard, yard);
-				}
-			}
-		}
-	}
+	if (stateCell[i][j] == 11)
+{
+    return;
+}
+else if (stateCell[i][j] == 10)
+{
+    stateCell[i][j] = cell[i][j];
+    if (stateCell[i][j] != 9)
+        CountTileLeft--;
+
+    if (stateCell[i][j] == 0)
+    {
+        for (int x = -1; x <= 1; x++)
+        {
+            for (int y = -1; y <= 1; y++)
+            {
+                int xard = i + x;
+                int yard = j + y;
+                if (xard < 0 || xard > board_size_x - 1 || yard < 0 || yard > board_size_y - 1)
+                    continue;
+                revealCells(xard, yard);
+            }
+        }
+    }
+}
 }
 void renderMineCount()
 {
