@@ -19,7 +19,6 @@ const int SCREEN_WIDTH = 889;
 const int SCREEN_HEIGHT = 500;
 const int TILE_SIZE = 28;
 
-// initialization functions
 bool init()
 {
 	bool loadingState = true;
@@ -225,42 +224,41 @@ bool loadMedia()
 	}
 	// load choice text
 	SDL_Color textColor = {255, 255, 255, 255};
-	if (!easyChoice.loadFromRenderedText("BEGINNER", textColor))
+	if (!easyLevel.loadFromRenderedText("BEGINNER", textColor))
 	{
 		printf("Fail");
 		loadingState = false;
 	}
-	if (!mediumChoice.loadFromRenderedText("INTERMEDIATE", textColor))
+	if (!mediumLevel.loadFromRenderedText("INTERMEDIATE", textColor))
 	{
 		printf("Fail");
 		loadingState = false;
 	}
-	if (!hardChoice.loadFromRenderedText("EXPERT", textColor))
+	if (!hardLevel.loadFromRenderedText("EXPERT", textColor))
 	{
 		printf("Fail");
 		loadingState = false;
 	}
 	SDL_Color textcolor = {255, 0, 0, 255};
-	if (!easyChoiceColor.loadFromRenderedText("BEGINNER", textcolor))
+	if (!easyLevelColor.loadFromRenderedText("BEGINNER", textcolor))
 	{
 		printf("Fail");
 		loadingState = false;
 	}
-	if (!mediumChoiceColor.loadFromRenderedText("INTERMEDIATE", textcolor))
+	if (!mediumLevelColor.loadFromRenderedText("INTERMEDIATE", textcolor))
 	{
 		printf("Fail");
 		loadingState = false;
 	}
-	if (!hardChoiceColor.loadFromRenderedText("EXPERT", textcolor))
+	if (!hardLevelColor.loadFromRenderedText("EXPERT", textcolor))
 	{
 		printf("Fail");
 		loadingState = false;
 	}
 	return loadingState;
 }
-
 // khoi tao game
-void GameCreateBoard()
+void gameCreateBoard()
 {
 	srand(time(0));
 	int mine = 0;
@@ -308,7 +306,7 @@ void GameCreateBoard()
 	}
 }
 
-void ArrangeButtons()
+void arrangeButtons()
 {
 	iconBtn.setPosition(board_size_x * TILE_SIZE / 2, digit_y);
 	backBtn.setPosition(0, 0);
@@ -333,10 +331,159 @@ void createMenu()
 void createLevelMenu()
 {
 	levelTheme.render(0, 0);
-	easyChoice.render(370, 200);
-	mediumChoice.render(335, 250);
-	hardChoice.render(385, 300);
+	easyLevel.render(370, 200);
+	mediumLevel.render(335, 250);
+	hardLevel.render(385, 300);
 	SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+}
+
+void setGameLevel(int x, int y, int n, int dx, int dy, int d1x, int d1y, int dtx, int &board_size_x, int &board_size_y, int &TotalOfMines, int &CountMineLeft, int &CountTileLeft, int &dist_x, int &dist_y, int &digit_x, int &digit_y, int &timeDigit_x)
+{
+	board_size_x = x;
+	board_size_y = y;
+	TotalOfMines = n;
+	CountMineLeft = n;
+	CountTileLeft = x * y;
+	dist_x = dx;
+	dist_y = dy;
+	digit_x = d1x;
+	digit_y = d1y;
+	timeDigit_x = dtx;
+
+	Buttons.resize(board_size_x);
+	for (int i = 0; i < board_size_x; i++)
+	{
+		Buttons[i].resize(board_size_y);
+	}
+	stateCell.resize(board_size_x);
+	for (int i = 0; i < board_size_x; i++)
+	{
+		stateCell[i].resize(board_size_y);
+	}
+	cell.resize(board_size_x);
+	for (int i = 0; i < board_size_x; i++)
+	{
+		cell[i].resize(board_size_y);
+	}
+}
+
+void openCells(int i, int j)
+{
+	if (stateCell[i][j] == 11) return;
+	else if (stateCell[i][j] == 10)
+	{
+		stateCell[i][j] = cell[i][j];	
+		if (stateCell[i][j] != 9)
+			CountTileLeft--;
+
+		if (stateCell[i][j] == 0)
+		{
+			for (int x = -1; x <= 1; x++)
+			{
+				for (int y = -1; y <= 1; y++)
+				{
+					int xard = i + x;
+					int yard = j + y;
+					if (xard < 0 || xard > board_size_x - 1 || yard < 0 || yard > board_size_y - 1)
+						continue;
+					openCells(xard, yard);
+				}
+			}
+		}
+	}
+}
+
+void isWin()
+{
+	if (CountTileLeft == NumberOfMines)
+		isWinning = true;
+}
+
+std::string getTime()
+{
+	stringstream Time{};
+	if (isWinning == true)
+	{
+		int n = timer.getTicks() / 1000;
+		int h, m, s;
+		h = n / 3600;
+		m = (n - h * 3600) / 60;
+		s = (n - h * 3600 - m * 60);
+		Time.str("");
+		Time << h << ":" << m << ":" << s;
+		return Time.str();
+	}
+	else
+	{
+		int n = timer.getTicks() / 1000;
+		int h, m, s;
+		h = n / 3600;
+		m = (n - h * 3600) / 60;
+		s = (n - h * 3600 - m * 60);
+		Time.str("");
+		Time << h << ":" << m << ":" << s;
+		return Time.str();
+	}
+}
+
+void PlayAgain()
+{
+	timer.start();
+	gameCreateBoard();
+	Mix_HaltMusic();
+	mineCountLeft = NumberOfMines;
+	CountTileLeft = board_size_x * board_size_y;
+	isWinning = false;
+	lose = false;
+	playAgain = false;
+}
+
+void handleEvent()
+{
+	SDL_Event e;
+	while (SDL_PollEvent(&e) != 0)
+	{
+		if (e.type == SDL_QUIT)
+		{
+			isRunning = false;
+			mainLoop = false;
+		}
+		iconBtn.handleEventAgain(&e);
+		backBtn.handleEventBack(&e);
+		audioBtn.handleEventMute(&e);
+		for (int i = 0; i < board_size_x; i++)
+		{
+			for (int j = 0; j < board_size_y; j++)
+			{
+				Buttons[i][j].handleEvent(&e);
+			}
+		}
+	}
+}
+
+void handleGameEvents()
+{
+	if (playAgain == true)
+		PlayAgain();
+	// nếu thua
+	if (lose == true)
+	{
+		timer.pause();
+		loseIcon.render(board_size_x * TILE_SIZE / 2, digit_y);
+		for (int i = 0; i < board_size_x; i++)
+		{
+			for (int j = 0; j < board_size_y; j++)
+			{
+				Buttons[i][j].loseRender(i, j);
+			}
+		}
+	}
+	// nếu thắng
+	if (isWinning == true)
+	{
+		timer.pause();
+		winIcon.render(board_size_x * TILE_SIZE / 2, digit_y);
+	}
 }
 
 void renderMenu()
@@ -407,9 +554,9 @@ void renderLevelSelected()
 			{
 				int x, y;
 				SDL_GetMouseState(&x, &y);
-				bool insideEasy = (x > 370 && x < 370 + easyChoice.getWidth() && y > 200 && y < 200 + easyChoice.getHeight());
-				bool insideMedium = (x > 335 && x < 335 + mediumChoice.getWidth() && y > 250 && y < 250 + mediumChoice.getHeight());
-				bool insideHard = (x > 385 && x < 385 + hardChoice.getWidth() && y > 300 && y < 300 + hardChoice.getHeight());
+				bool insideEasy = (x > 370 && x < 370 + easyLevel.getWidth() && y > 200 && y < 200 + easyLevel.getHeight());
+				bool insideMedium = (x > 335 && x < 335 + mediumLevel.getWidth() && y > 250 && y < 250 + mediumLevel.getHeight());
+				bool insideHard = (x > 385 && x < 385 + hardLevel.getWidth() && y > 300 && y < 300 + hardLevel.getHeight());
 				if (insideEasy)
 					gameMode = 1; // cấp độ chơi dễ
 				else if (insideMedium)
@@ -430,7 +577,7 @@ void renderLevelSelected()
 							hard = false;
 							SDL_SetWindowSize(window, 294, 436);
 							setGameLevel(9, 9, 10, 21, 163, 25, 80, 235, board_size_x, board_size_y, NumberOfMines, mineCountLeft, CountTileLeft, distance_x, distance_y, digit_x, digit_y, timeDigit_x);
-							GameCreateBoard();
+							gameCreateBoard();
 						}
 						else if (gameMode == 2)
 						{
@@ -442,7 +589,7 @@ void renderLevelSelected()
 							hard = false;
 							SDL_SetWindowSize(window, 488, 630);
 							setGameLevel(16, 16, 40, 21, 163, 25, 80, 430, board_size_x, board_size_y, NumberOfMines, mineCountLeft, CountTileLeft, distance_x, distance_y, digit_x, digit_y, timeDigit_x);
-							GameCreateBoard();
+							gameCreateBoard();
 						}
 						else if (gameMode == 3)
 						{
@@ -454,7 +601,7 @@ void renderLevelSelected()
 							hard = true;
 							SDL_SetWindowSize(window, 880, 632);
 							setGameLevel(30, 16, 90, 21, 163, 25, 80, 820, board_size_x, board_size_y, NumberOfMines, mineCountLeft, CountTileLeft, distance_x, distance_y, digit_x, digit_y, timeDigit_x);
-							GameCreateBoard();
+							gameCreateBoard();
 						}
 					}
 				}
@@ -463,35 +610,7 @@ void renderLevelSelected()
 		SDL_RenderPresent(renderer); // vẽ màn hình sau khi đã xử lý sự kiện
 	}
 }
-// mở ô
-void revealCells(int i, int j)
-{
-	if (stateCell[i][j] == 11)
-{
-    return;
-}
-else if (stateCell[i][j] == 10)
-{
-    stateCell[i][j] = cell[i][j];
-    if (stateCell[i][j] != 9)
-        CountTileLeft--;
 
-    if (stateCell[i][j] == 0)
-    {
-        for (int x = -1; x <= 1; x++)
-        {
-            for (int y = -1; y <= 1; y++)
-            {
-                int xard = i + x;
-                int yard = j + y;
-                if (xard < 0 || xard > board_size_x - 1 || yard < 0 || yard > board_size_y - 1)
-                    continue;
-                revealCells(xard, yard);
-            }
-        }
-    }
-}
-}
 void renderMineCount()
 {
 	int n = mineCountLeft;
@@ -517,149 +636,25 @@ void renderMineCount()
 		}
 	}
 }
-// ham trong game
-void handleEvent()
-{
-	SDL_Event e;
-	while (SDL_PollEvent(&e) != 0)
-	{
-		if (e.type == SDL_QUIT)
-		{
-			isRunning = false;
-			mainLoop = false;
-		}
-		iconBtn.handleEventAgain(&e);
-		backBtn.handleEventBack(&e);
-		audioBtn.handleEventMute(&e);
-		for (int i = 0; i < board_size_x; i++)
-		{
-			for (int j = 0; j < board_size_y; j++)
-			{
-				Buttons[i][j].handleEvent(&e);
-			}
-		}
-	}
-}
 
-void HandleGameEvents()
-{
-	if (playAgain == true)
-		PlayAgain();
-	// if we lose
-	if (lose == true)
-	{
-		timer.pause();
-		loseIcon.render(board_size_x * TILE_SIZE / 2, digit_y);
-		for (int i = 0; i < board_size_x; i++)
-		{
-			for (int j = 0; j < board_size_y; j++)
-			{
-				Buttons[i][j].loseRender(i, j);
-			}
-		}
-	}
-	// if we win
-	if (isWinning == true)
-	{
-		timer.pause();
-		winIcon.render(board_size_x * TILE_SIZE / 2, digit_y);
-	}
-}
-
-void IsWin()
-{
-	if (CountTileLeft == NumberOfMines)
-		isWinning = true;
-}
-
-std::string getTime()
-{
-	stringstream Time{};
-	if (isWinning == true)
-	{
-		int n = timer.getTicks() / 1000;
-		int h, m, s;
-		h = n / 3600;
-		m = (n - h * 3600) / 60;
-		s = (n - h * 3600 - m * 60);
-		Time.str("");
-		Time << h << ":" << m << ":" << s;
-		return Time.str();
-	}
-	else
-	{
-		int n = timer.getTicks() / 1000;
-		int h, m, s;
-		h = n / 3600;
-		m = (n - h * 3600) / 60;
-		s = (n - h * 3600 - m * 60);
-		Time.str("");
-		Time << h << ":" << m << ":" << s;
-		return Time.str();
-	}
-}
-
-void PlayAgain()
-{
-	timer.start();
-	GameCreateBoard();
-	Mix_HaltMusic();
-	mineCountLeft = NumberOfMines;
-	CountTileLeft = board_size_x * board_size_y;
-	isWinning = false;
-	lose = false;
-	playAgain = false;
-}
-void setGameLevel(int x, int y, int n, int dx, int dy, int d1x, int d1y, int dtx, int &board_size_x, int &board_size_y, int &NumberOfMines, int &mineCountLeft, int &CountTileLeft, int &distance_x, int &distance_y, int &digit_x, int &digit_y, int &timeDigit_x)
-{
-	board_size_x = x;
-	board_size_y = y;
-	NumberOfMines = n;
-	mineCountLeft = n;
-	CountTileLeft = x * y;
-	distance_x = dx;
-	distance_y = dy;
-	digit_x = d1x;
-	digit_y = d1y;
-	timeDigit_x = dtx;
-
-	Buttons.resize(board_size_x);
-	for (int i = 0; i < board_size_x; i++)
-	{
-		Buttons[i].resize(board_size_y);
-	}
-	stateCell.resize(board_size_x);
-	for (int i = 0; i < board_size_x; i++)
-	{
-		stateCell[i].resize(board_size_y);
-	}
-	cell.resize(board_size_x);
-	for (int i = 0; i < board_size_x; i++)
-	{
-		cell[i].resize(board_size_y);
-	}
-}
-
-void TimeManager()
+void renderTime()
 {
 	int n = timer.getTicks() / 1000;
+	int digitIndex = 0;
+
 	if (n < 10)
 	{
-		for (int i = 0; i <= 9; i++)
-		{
-			if (i == n)
-				Digits.render(timeDigit_x, digit_y, &Digitsprites[n]);
-		}
+		Digits.render(timeDigit_x, digit_y, &Digitsprites[n]);
+		digitIndex = 28;
 	}
 	else
 	{
-		int i = 0;
 		while (n > 0)
 		{
-			int x = n % 10;
+			int digit = n % 10;
+			Digits.render(timeDigit_x - digitIndex, digit_y, &Digitsprites[digit]);
 			n /= 10;
-			Digits.render(timeDigit_x - i * 28, digit_y, &Digitsprites[x]);
-			i++;
+			digitIndex += 28;
 		}
 	}
 }
@@ -714,13 +709,12 @@ void renderGame()
 	renderButton();
 	back.render(0, 0);
 	renderMineCount();
-	IsWin();
-	TimeManager();
-	HandleGameEvents();
+	isWin();
+	renderTime();
+	handleGameEvents();
 	SDL_RenderPresent(renderer);
 }
 
-// close SDL
 void close()
 {
 	// Free loaded images

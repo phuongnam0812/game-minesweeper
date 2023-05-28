@@ -15,7 +15,6 @@ int WinMain(int argc, char *argv[])
 	{
 		if (loadMedia())
 		{
-			
 				renderMenu();
 				while (mainLoop)
 				{
@@ -26,7 +25,7 @@ int WinMain(int argc, char *argv[])
 					while (isRunning)
 					{
 						handleEvent();
-						ArrangeButtons();
+						arrangeButtons();
 						renderGame();
 					}
 				}

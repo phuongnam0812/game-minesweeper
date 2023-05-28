@@ -186,7 +186,7 @@ void Button::handleEvent(SDL_Event *e)
 				{
 				case SDL_BUTTON_LEFT:
 				{
-					revealCells(i, j);
+					openCells(i, j);
 					if (CountTileLeft == NumberOfMines)
 					{
 						Mix_PlayMusic(winMusic, 1);
