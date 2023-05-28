@@ -7,7 +7,8 @@
                 "C:/phuongnam/Game/ASDL/SDL2-2.26.5/x86_64-w64-mingw32/include/SDL2",
                 "C:/phuongnam/Game/ASDL/SDL2_image-2.6.3/x86_64-w64-mingw32/include/SDL2",
                 "C:\\phuongnam\\Game\\ASDL\\SDL2_ttf-2.20.2\\x86_64-w64-mingw32\\include\\SDL2",
-                "C:\\phuongnam\\Game\\ASDL\\SDL2_mixer-2.6.3\\x86_64-w64-mingw32\\include\\SDL2"
+                "C:\\phuongnam\\Game\\ASDL\\SDL2_mixer-2.6.3\\x86_64-w64-mingw32\\include\\SDL2",
+                "C:/phuongnam/Game/ASDL/SDL2-2.26.5/x86_64-w64-mingw32/include/SDL2"
             ],
             "defines": [
                 "_DEBUG",

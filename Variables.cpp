@@ -12,7 +12,7 @@ extern bool lose = false;
 
 // mines
 extern int mineCountLeft = NumberOfMines;
-extern int CountTileLeft = board_size_x * board_size_y;
+extern int CountCellLeft = board_size_x * board_size_y;
 
 // images use in game
 extern Texture menuTheme(NULL, 0, 0);
@@ -48,9 +48,9 @@ extern Texture mInput(NULL, 0, 0);
 extern std::vector<std::vector<int>> stateCell(3, std::vector<int>(2, 0));
 extern std::vector<std::vector<int>> cell(3, std::vector<int>(2, 0));
 
-// Tiles in board
-extern Texture Tiles_image(NULL, 0, 0);
-extern SDL_Rect Tilesprites[12] = {};
+// Cells in board
+extern Texture Cells_image(NULL, 0, 0);
+extern SDL_Rect Cellsprites[12] = {};
 
 // audio
 extern bool mute = false;

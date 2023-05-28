@@ -35,10 +35,6 @@ extern Texture winIcon;
 extern Texture playingIcon;
 extern Texture loseIcon;
 
-// Tiles in board
-extern Texture Tiles_image;
-extern SDL_Rect Tilesprites[12];
-
 // text
 extern Texture playBtn;
 extern Texture exitBtn;
@@ -59,15 +55,19 @@ extern TTF_Font *gFont;
 extern std::vector<std::vector<int>> stateCell;
 extern std::vector<std::vector<int>> cell;
 
+// Cells in board
+extern Texture Cells_image;
+extern SDL_Rect Cellsprites[12];
+
 // mines
 extern int mineCountLeft;
-extern int CountTileLeft;
+extern int CountCellLeft;
 
 // audio
 extern bool mute;
 extern Mix_Chunk *click;
-extern Mix_Music *loseMusic;
-extern Mix_Music *winMusic;
+extern Mix_MusicloseMusic;
+extern Mix_Music winMusic;
 
 // distance
 extern int distance_x;

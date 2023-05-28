@@ -15,23 +15,22 @@ int WinMain(int argc, char *argv[])
 	{
 		if (loadMedia())
 		{
-				renderMenu();
-				while (mainLoop)
+			renderMenu();
+			while (mainLoop)
+			{
+				if (isChoosing)
 				{
-					if (isChoosing)
-					{
-						renderLevelSelected();
-					}
-					while (isRunning)
-					{
-						handleEvent();
-						arrangeButtons();
-						renderGame();
-					}
+					renderLevelSelected();
 				}
+				while (isRunning)
+				{
+					handleEvent();
+					arrangeButtons();
+					renderGame();
+				}
+			}
 		}
 	}
-	// Free resources and close SDL
 	close();
 	return 0;
 }

@@ -14,11 +14,6 @@ public:
 	// Sets top left position
 	void setPosition(int x, int y);
 
-	// set button in game
-	void handleEventAgain(SDL_Event *e);
-	void handleEventBack(SDL_Event *e);
-	void handleEventMute(SDL_Event *e);
-
 	// Handles mouse event
 	void handleEvent(SDL_Event *e);
 
@@ -27,6 +22,11 @@ public:
 
 	// Shows button sprite when we lose
 	void loseRender(int i, int j);
+
+	// set button in game
+	void handleEventAgain(SDL_Event *e);
+	void handleEventBack(SDL_Event *e);
+	void handleEventMute(SDL_Event *e);
 
 private:
 	// Top left position

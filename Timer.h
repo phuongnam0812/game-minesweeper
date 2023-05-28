@@ -17,7 +17,7 @@ public:
 private:
 	Uint32 mStartTicks;
 	Uint32 mPausedTicks;
-	bool mPaused;
 	bool mStarted;
+	bool mPaused;
 };
 #endif

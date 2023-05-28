@@ -4,7 +4,7 @@
 
 const int SCREEN_WIDTH = 889;
 const int SCREEN_HEIGHT = 500;
-const int TILE_SIZE = 28;
+const int CELL_SIZE = 28;
 
 Button::Button()
 {
@@ -141,53 +141,53 @@ void Button::handleEventMute(SDL_Event *e)
 
 void Button::handleEvent(SDL_Event *e)
 {
-	// neu xu kien xay ra 
+	// neu xu kien xay ra
 	if (e->type == SDL_MOUSEMOTION || e->type == SDL_MOUSEBUTTONDOWN || e->type == SDL_MOUSEBUTTONUP)
 	{
-		// lay vi tri cua chuot 
+		// lay vi tri cua chuot
 		int x, y;
 		SDL_GetMouseState(&x, &y);
 
-		int i = (x - distance_x) / TILE_SIZE;
-		int j = (y - distance_y) / TILE_SIZE;
+		int i = (x - distance_x) / CELL_SIZE;
+		int j = (y - distance_y) / CELL_SIZE;
 
-		// kiem tra chuot co dang o vi tri cua btn khong 
+		// kiem tra chuot co dang o vi tri cua btn khong
 		bool inside = true;
 
-		// chuot ben trai 
+		// chuot ben trai
 		if (x < mPosition.x)
 		{
 			inside = false;
 		}
-		// chuot ben phai 
-		else if (x > mPosition.x + TILE_SIZE)
+		// chuot ben phai
+		else if (x > mPosition.x + CELL_SIZE)
 		{
 			inside = false;
 		}
-		// chuot ben tren 
+		// chuot ben tren
 		else if (y < mPosition.y)
 		{
 			inside = false;
 		}
-		// chuot ben duoi 
-		else if (y > mPosition.y + TILE_SIZE)
+		// chuot ben duoi
+		else if (y > mPosition.y + CELL_SIZE)
 		{
 			inside = false;
 		}
 
-		// chuot o trong btn 
+		// chuot o trong btn
 		if (inside)
 		{
 			if (e->type == SDL_MOUSEBUTTONDOWN)
 			{
 
-				// khi nhap chuot 
+				// khi nhap chuot
 				switch (e->button.button)
 				{
 				case SDL_BUTTON_LEFT:
 				{
 					openCells(i, j);
-					if (CountTileLeft == NumberOfMines)
+					if (CountCellLeft == NumberOfMines)
 					{
 						Mix_PlayMusic(winMusic, 1);
 					}
@@ -231,10 +231,10 @@ void Button::handleEvent(SDL_Event *e)
 void Button::render(int i, int j)
 {
 	// Show current button sprite
-	Tiles_image.render(mPosition.x, mPosition.y, &Tilesprites[stateCell[i][j]]);
+	Cells_image.render(mPosition.x, mPosition.y, &Cellsprites[stateCell[i][j]]);
 }
 void Button::loseRender(int i, int j)
 {
 	// Show all button sprite
-	Tiles_image.render(mPosition.x, mPosition.y, &Tilesprites[cell[i][j]]);
+	Cells_image.render(mPosition.x, mPosition.y, &Cellsprites[cell[i][j]]);
 }
