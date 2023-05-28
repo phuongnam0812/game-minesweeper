@@ -170,7 +170,7 @@ void gameCreateBoard()
 	SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 
 	// đặt mìn ngẫu nhiên
-	while (mine < NumberOfMines)
+	while (mine < TotalOfMines)
 	{
 		int i = rand() % board_size_x;
 		int j = rand() % board_size_y;
@@ -356,7 +356,7 @@ void openCells(int i, int j)
 
 void isWin()
 {
-	if (CountCellLeft == NumberOfMines)
+	if (CountCellLeft == TotalOfMines)
 		isWinning = true;
 }
 
@@ -377,7 +377,7 @@ void PlayAgain()
 	timer.start();
 	gameCreateBoard();
 	Mix_HaltMusic();
-	mineCountLeft = NumberOfMines;
+	mineCountLeft = TotalOfMines;
 	CountCellLeft = board_size_x * board_size_y;
 	isWinning = false;
 	lose = false;
@@ -503,7 +503,7 @@ void renderLevelSelected()
 							medium = false;
 							hard = false;
 							SDL_SetWindowSize(window, 294, 436);
-							setGameLevel(9, 9, 10, 21, 163, 25, 80, 235, board_size_x, board_size_y, NumberOfMines, mineCountLeft, CountCellLeft, distance_x, distance_y, digit_x, digit_y, timeDigit_x);
+							setGameLevel(9, 9, 10, 21, 163, 25, 80, 235, board_size_x, board_size_y, TotalOfMines, mineCountLeft, CountCellLeft, distance_x, distance_y, digit_x, digit_y, timeDigit_x);
 							gameCreateBoard();
 						}
 						else if (gameMode == 2)
@@ -515,7 +515,7 @@ void renderLevelSelected()
 							medium = true;
 							hard = false;
 							SDL_SetWindowSize(window, 488, 630);
-							setGameLevel(16, 16, 40, 21, 163, 25, 80, 430, board_size_x, board_size_y, NumberOfMines, mineCountLeft, CountCellLeft, distance_x, distance_y, digit_x, digit_y, timeDigit_x);
+							setGameLevel(16, 16, 40, 21, 163, 25, 80, 430, board_size_x, board_size_y, TotalOfMines, mineCountLeft, CountCellLeft, distance_x, distance_y, digit_x, digit_y, timeDigit_x);
 							gameCreateBoard();
 						}
 						else if (gameMode == 3)
@@ -527,7 +527,7 @@ void renderLevelSelected()
 							medium = false;
 							hard = true;
 							SDL_SetWindowSize(window, 880, 632);
-							setGameLevel(30, 16, 90, 21, 163, 25, 80, 820, board_size_x, board_size_y, NumberOfMines, mineCountLeft, CountCellLeft, distance_x, distance_y, digit_x, digit_y, timeDigit_x);
+							setGameLevel(30, 16, 90, 21, 163, 25, 80, 820, board_size_x, board_size_y, TotalOfMines, mineCountLeft, CountCellLeft, distance_x, distance_y, digit_x, digit_y, timeDigit_x);
 							gameCreateBoard();
 						}
 					}

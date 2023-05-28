@@ -11,7 +11,7 @@ extern bool isWinning = false;
 extern bool lose = false;
 
 // mines
-extern int mineCountLeft = NumberOfMines;
+extern int mineCountLeft = TotalOfMines;
 extern int CountCellLeft = board_size_x * board_size_y;
 
 // images use in game
@@ -72,7 +72,7 @@ extern SDL_Rect Digitsprites[10] = {};
 // Board size
 extern int board_size_x = 0;
 extern int board_size_y = 0;
-extern int NumberOfMines = 0;
+extern int TotalOfMines = 0;
 
 // boolean
 extern bool playAgain = false;

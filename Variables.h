@@ -83,7 +83,7 @@ extern SDL_Rect Digitsprites[10];
 // board size
 extern int board_size_x;
 extern int board_size_y;
-extern int NumberOfMines;
+extern int TotalOfMines;
 
 // boolean
 extern bool playAgain;
